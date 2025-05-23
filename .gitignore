@@ -72,3 +72,30 @@ Plugins/**/Intermediate/*
 
 # Cache files for the editor to use
 DerivedDataCache/*
+*.sln
+*.VC.db
+*.VC.opendb
+*.log
+*.tmp
+*.bak
+*.cache
+*.generated.*
+*_Backup.*
+*.xcodeproj
+*.xcworkspace
+*.sln.iml
+*.pdb
+*.obj
+*.dll
+*.exe
+*.lib
+*.apk
+*.ipa
+*.log
+*.tmp
+*.bak
+*.cache
+*.generated.*
+*_Backup.*
+*.xcodeproj
+*.xcworkspace
