@@ -13,6 +13,12 @@ class AMultiplayerCourseGameMode : public AGameModeBase
 
 public:
 	AMultiplayerCourseGameMode();
+
+	UFUNCTION(BlueprintCallable)
+	void HostLANGame();
+
+	UFUNCTION(BlueprintCallable)
+	void JoinLANGame();
 };
 
 
