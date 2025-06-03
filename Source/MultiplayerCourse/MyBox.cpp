@@ -19,7 +19,9 @@ AMyBox::AMyBox()
 void AMyBox::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	if (HasAuthority()) {
+		GetWorld()->GetTimerManager().SetTimer(TestTimer, this, &AMyBox::DecreaseReplicatedVar, 2.0f, false);
+	}
 }
 
 // Called every frame
@@ -48,5 +50,32 @@ void AMyBox::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimePr
 	//Call each replicated var here!
 
 	DOREPLIFETIME(AMyBox, ReplicatedVar);
+}
+
+void AMyBox::DecreaseReplicatedVar()
+{
+	if (HasAuthority()) {
+		ReplicatedVar -= 1.0f;
+		OnRep_ReplicatedVar(); //to call it on server as well
+		if (ReplicatedVar > 0) {
+			GetWorld()->GetTimerManager().SetTimer(TestTimer, this, &AMyBox::DecreaseReplicatedVar, 2.0f, false);
+		}
+	}
+}
+
+void AMyBox::OnRep_ReplicatedVar() 
+{
+	if (HasAuthority()) 
+	{
+		FVector NewLocation = GetActorLocation() + FVector(0.0f, 0.0f, 200.0f);
+		SetActorLocation(NewLocation);
+		//Since movement is replicated, I will move it on the server side!
+
+		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, TEXT("Server: OnRep_ReplicatedVar"));
+	}
+	else {
+		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green, 
+			FString::Printf(TEXT("Client %d: OnRep_ReplicatedVar"), GPlayInEditorID));
+	}
 }
 

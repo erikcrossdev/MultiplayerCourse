@@ -9,7 +9,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-
+#include "Net/UnrealNetwork.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AMultiplayerCourseCharacter
@@ -63,6 +63,13 @@ void AMultiplayerCourseCharacter::BeginPlay()
 		{
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
+	}
+}
+
+void AMultiplayerCourseCharacter::ServerRPCTest_Implementation()
+{
+	if (HasAuthority()) {
+		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, TEXT("ServerRPCTest_Implementation"));
 	}
 }
 
