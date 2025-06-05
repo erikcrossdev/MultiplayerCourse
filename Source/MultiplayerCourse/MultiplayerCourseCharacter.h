@@ -57,13 +57,16 @@ protected:
 	// To add mapping context
 	virtual void BeginPlay();
 
-	UFUNCTION(Server, Reliable, BlueprintCallable)
-	void ServerRPCTest();
+	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable)
+	void ServerRPCTest(int intParam);
 
 public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+	
+	UPROPERTY(EditAnywhere)
+	UStaticMesh* SphereMesh;
 };
 

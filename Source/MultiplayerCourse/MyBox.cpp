@@ -21,6 +21,7 @@ void AMyBox::BeginPlay()
 	Super::BeginPlay();
 	if (HasAuthority()) {
 		GetWorld()->GetTimerManager().SetTimer(TestTimer, this, &AMyBox::DecreaseReplicatedVar, 2.0f, false);
+		GetWorld()->GetTimerManager().SetTimer(TestTimer, this, &AMyBox::MulticastRPCExplode, 2.0f, false);
 	}
 }
 
@@ -60,6 +61,19 @@ void AMyBox::DecreaseReplicatedVar()
 		if (ReplicatedVar > 0) {
 			GetWorld()->GetTimerManager().SetTimer(TestTimer, this, &AMyBox::DecreaseReplicatedVar, 2.0f, false);
 		}
+	}
+}
+
+void AMyBox::MulticastRPCExplode_Implementation()
+{
+	if (HasAuthority()) {
+		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green,
+			FString::Printf(TEXT("Server %d: MulticastExampleRPC_Implementation"), GPlayInEditorID));
+		GetWorld()->GetTimerManager().SetTimer(TestTimer, this, &AMyBox::MulticastRPCExplode, 2.0f, false);
+	}
+	else {
+		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Cyan,
+			FString::Printf(TEXT("Client %d: MulticastExampleRPC_Implementation"), GPlayInEditorID));
 	}
 }
 

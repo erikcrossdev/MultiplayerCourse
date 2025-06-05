@@ -10,6 +10,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Net/UnrealNetwork.h"
+#include "Engine/StaticMeshActor.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AMultiplayerCourseCharacter
@@ -18,7 +19,7 @@ AMultiplayerCourseCharacter::AMultiplayerCourseCharacter()
 {
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
-		
+
 	// Don't rotate when the controller rotates. Let that just affect the camera.
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
@@ -66,11 +67,38 @@ void AMultiplayerCourseCharacter::BeginPlay()
 	}
 }
 
-void AMultiplayerCourseCharacter::ServerRPCTest_Implementation()
+void AMultiplayerCourseCharacter::ServerRPCTest_Implementation(int intParam)
 {
 	if (HasAuthority()) {
+#if 0 
+		//#if is a preprocessor directive to deactive part of the code, you could use 0 to disable it and 1 to enable it
 		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, TEXT("ServerRPCTest_Implementation"));
+#endif
+		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green, FString::Printf(TEXT("intParam: %d"), intParam));
+		if (!SphereMesh) return;
+		AStaticMeshActor* StaticMeshActor = GetWorld()->SpawnActor< AStaticMeshActor>(AStaticMeshActor::StaticClass());
+		if (StaticMeshActor)
+		{
+			StaticMeshActor->SetReplicates(true);
+			StaticMeshActor->SetReplicateMovement(true);
+			StaticMeshActor->SetMobility(EComponentMobility::Movable);
+			FVector SpawnLocation = (GetActorLocation() + GetActorRotation().Vector() * 100.0f) + (GetActorUpVector() * 50.0f); //a vector 100 cm in front of the player
+			StaticMeshActor->SetActorLocation(SpawnLocation);
+			UStaticMeshComponent* StaticMeshComponent = StaticMeshActor->GetStaticMeshComponent();
+			if (StaticMeshComponent)
+			{
+				StaticMeshComponent->SetIsReplicated(true);
+				StaticMeshComponent->SetSimulatePhysics(true);
+				StaticMeshComponent->SetStaticMesh(SphereMesh);
+			}
+
+		}
 	}
+}
+//yes, it needs to return a bool and be named "_Validate"
+//If returns true - validates; False - gives an invalid and it won't execute the RPC and it will disconnect the client!
+bool AMultiplayerCourseCharacter::ServerRPCTest_Validate(int intParam) {
+	return intParam >= 0 && intParam <= 100;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -80,7 +108,7 @@ void AMultiplayerCourseCharacter::SetupPlayerInputComponent(class UInputComponen
 {
 	// Set up action bindings
 	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent)) {
-		
+
 		//Jumping
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
@@ -108,7 +136,7 @@ void AMultiplayerCourseCharacter::Move(const FInputActionValue& Value)
 
 		// get forward vector
 		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-	
+
 		// get right vector 
 		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 
