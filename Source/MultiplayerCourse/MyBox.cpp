@@ -3,6 +3,7 @@
 
 #include "MyBox.h"
 #include "Net/UnrealNetwork.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AMyBox::AMyBox()
@@ -75,6 +76,14 @@ void AMyBox::MulticastRPCExplode_Implementation()
 		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Cyan,
 			FString::Printf(TEXT("Client %d: MulticastExampleRPC_Implementation"), GPlayInEditorID));
 	}
+
+	//We need to check if there is a dedicated server, doesn't make any sense spawn SFX and VFX on a pure server
+
+	if (!IsRunningDedicatedServer()) {
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionEffect, GetActorLocation(),
+			FRotator::ZeroRotator, true, EPSCPoolMethod::AutoRelease);
+	}
+
 }
 
 void AMyBox::OnRep_ReplicatedVar() 
