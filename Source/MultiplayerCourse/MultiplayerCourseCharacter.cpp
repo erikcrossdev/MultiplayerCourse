@@ -11,6 +11,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "Net/UnrealNetwork.h"
 #include "Engine/StaticMeshActor.h"
+#include <Kismet/GameplayStatics.h>
 
 //////////////////////////////////////////////////////////////////////////
 // AMultiplayerCourseCharacter
@@ -67,16 +68,29 @@ void AMultiplayerCourseCharacter::BeginPlay()
 	}
 }
 
+void AMultiplayerCourseCharacter::ClientRPCFunction_Implementation()
+{
+	if (ParticleSystem) {
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ParticleSystem, GetActorLocation(),
+			FRotator::ZeroRotator, true, EPSCPoolMethod::AutoRelease);
+	}
+}
+
 void AMultiplayerCourseCharacter::ServerRPCTest_Implementation(int intParam)
 {
 	if (HasAuthority()) {
 #if 0 
 		//#if is a preprocessor directive to deactive part of the code, you could use 0 to disable it and 1 to enable it
 		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, TEXT("ServerRPCTest_Implementation"));
-#endif
 		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green, FString::Printf(TEXT("intParam: %d"), intParam));
+#endif
 		if (!SphereMesh) return;
-		AStaticMeshActor* StaticMeshActor = GetWorld()->SpawnActor< AStaticMeshActor>(AStaticMeshActor::StaticClass());
+
+		FActorSpawnParameters SpawnParameters;
+		SpawnParameters.Owner = this; //multiplayerCourseCharacter will be the owner of the StaticMesh
+		AStaticMeshActor* StaticMeshActor = GetWorld()->SpawnActor< AStaticMeshActor>(SpawnParameters); //setting ower at spawn
+		//Or we could set the owner after spawn it:
+		//StaticMeshActor->SetOwner(this);
 		if (StaticMeshActor)
 		{
 			StaticMeshActor->SetReplicates(true);

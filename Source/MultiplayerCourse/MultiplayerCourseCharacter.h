@@ -60,6 +60,9 @@ protected:
 	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable)
 	void ServerRPCTest(int intParam);
 
+	UFUNCTION(Client, Reliable, BlueprintCallable)
+	void ClientRPCFunction();
+
 public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
@@ -68,5 +71,8 @@ public:
 	
 	UPROPERTY(EditAnywhere)
 	UStaticMesh* SphereMesh;
+
+	UPROPERTY(EditAnywhere)
+	UParticleSystem* ParticleSystem;
 };
 

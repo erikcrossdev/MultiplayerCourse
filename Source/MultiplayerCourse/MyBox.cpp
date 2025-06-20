@@ -68,13 +68,15 @@ void AMyBox::DecreaseReplicatedVar()
 void AMyBox::MulticastRPCExplode_Implementation()
 {
 	if (HasAuthority()) {
+		/*
 		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green,
-			FString::Printf(TEXT("Server %d: MulticastExampleRPC_Implementation"), GPlayInEditorID));
+			FString::Printf(TEXT("Server %d: MulticastExampleRPC_Implementation"), GPlayInEditorID));*/
 		GetWorld()->GetTimerManager().SetTimer(TestTimer, this, &AMyBox::MulticastRPCExplode, 2.0f, false);
 	}
 	else {
+		/*
 		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Cyan,
-			FString::Printf(TEXT("Client %d: MulticastExampleRPC_Implementation"), GPlayInEditorID));
+			FString::Printf(TEXT("Client %d: MulticastExampleRPC_Implementation"), GPlayInEditorID));*/
 	}
 
 	//We need to check if there is a dedicated server, doesn't make any sense spawn SFX and VFX on a pure server
@@ -94,11 +96,12 @@ void AMyBox::OnRep_ReplicatedVar()
 		SetActorLocation(NewLocation);
 		//Since movement is replicated, I will move it on the server side!
 
-		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, TEXT("Server: OnRep_ReplicatedVar"));
+		//GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, TEXT("Server: OnRep_ReplicatedVar"));
 	}
 	else {
+		/*
 		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green, 
-			FString::Printf(TEXT("Client %d: OnRep_ReplicatedVar"), GPlayInEditorID));
+			FString::Printf(TEXT("Client %d: OnRep_ReplicatedVar"), GPlayInEditorID));*/
 	}
 }
 
